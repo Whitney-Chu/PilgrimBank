@@ -1,0 +1,97 @@
+---
+title: "Pilgrim_Bank_B_Case_Study"
+author: "Whitney Chu - chux3220@mylaurier.ca"
+date: "02/10/2020"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#Install Packages
+```{r}
+library(tidyverse)    
+library(e1071)  
+install.packages('e1071') 
+library(kernlab)     
+library(datasets)
+library(class)
+library(RColorBrewer)
+library(dplyr)
+```
+
+#Read and Import Pilgrim Bank Data
+```{r}
+PBD <- read.csv("PilgrimDataExt.csv")
+```
+
+#Preview Dataset
+```{r}
+# Preview the head and summary of the dataset
+head(PBD)
+summary(PBD)
+dim(PBD)
+```
+
+
+#Create Target Variable
+```{r}
+# create a column for customer retention (target variable)
+names(PBD)
+PBD <- data.frame(PBD)
+ret <- c("Customer_Retention")
+PBD[, ret ] <- NA
+names(PBD)
+PBD$Customer_Retention <- ifelse(is.na(PBD$X0Profit), 0, 1)
+```
+
+
+#Create training and test set
+```{r}
+# 75% Train and 25% Test
+index <- c(1:nrow(PBD))
+split <- sample(index, size = (length(index)/(4)))
+train <- PBD[-split, ]
+test <- PBD[split,]
+
+```
+
+
+#Generate Classifier
+```{r}
+# Fitting SVM to the Training set 
+
+train[is.na(train)] <- 9999
+train.mod = svm(formula = Customer_Retention ~ ., 
+				data = train,kernel = 'linear') 
+plot(train.mod, train)
+```
+
+#Assess Error
+Assessment of the Training error and Testing Error.
+##Training Error
+```{r}
+predict.ret <- predict(train.mod,train)
+pred <- ifelse(predict.ret > 0.5, "1", "0")
+mean(train$Customer_Retention!=pred)
+```
+
+##Testing Error
+```{r}
+predict.ret <- predict(train.mod,test)
+pred <- ifelse(predict.ret > 0.5, "1", "0")
+mean(test$Customer_Retention!=pred)
+```
+
+
+
+
+
+
+
+
+
+
+
+
