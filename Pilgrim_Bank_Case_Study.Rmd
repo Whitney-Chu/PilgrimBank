@@ -1,0 +1,63 @@
+---
+title: "Pilgrim_Bank_Case_Study"
+author: "Whitney Chu"
+date: "24/09/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Understanding the Pilgrim Bank Data
+Read and import the pilgrim bank data.
+```{r}
+pbdata<- read.csv("PilgrimData.csv")
+```
+
+## Summary of the Data
+Summary of the Pilgrim Bank Data is as follows:
+```{r}
+summary(pbdata)
+```
+
+## Dimensions of the data
+Dimensions of the data are:
+```{r}
+dim(pbdata)
+```
+## Structure of the Data
+The structure of the data that shows the label, data type and values is as follows:
+```{r}
+str(pbdata)
+```
+
+
+# Format of the Data
+The data is organized in a table format with 11 columns and 31634 rows. R specifies that It is composed of both integers and numerical values. The data being displayed is for two specific years: 1999 and 2000. For each year, the data includes profit per customer, whether the customer performs online banking, customers age, customers income, customers tenure with the bank, district the customer is from and whether the customer pays their bills online. 
+
+
+# Categorical data types in the data
+This data set contains some categorical data. Whether the customer uses online banking and whether the customer pays their bills online displays categorical data.  The data gives customers that uses online banking/pays bills online a number 1 and those that do no use online banking/pay bills online is given a 0. The column district only contains three different values: 1100, 1200 and 1300, which may represent the three different geographical areas in which the customers live. Therefore, this could also be considered categorical data.
+
+# X9District
+Categorizing the district data in 1999 and storing it in levels using the function "Factor".
+```{r}
+pbdata$X9District<-as.factor(pbdata$X9District)
+str(pbdata$X9District)
+```
+This shows that there are only three possible outcomes for the column X9District.
+
+# Age and Income
+Age and income are both specified by R as numerical values, however the data contains values of "NA" so therefore the data type is inferred incorrectly. Majority of the data for age and income are numerical values and there are only a specific number of options for the values in the data. The numbers all typically fall between 1 to 9. If there were no "NA" values then the data type could remain a numerical value or factor, and it would be considered categorical. These numbers are not directly the age and income of the customers, so these numbers must represent a different value. For example they could potentially represent a range in numbers that are associated to a number between 1 to 9.
+
+# Profitability of the customers
+Figure 1 below, displays the profitability of customers in both 1999 and 2000. With all the outliers being displayed, it is hard to tell the difference between the two years.
+```{r}
+boxplot(pbdata$X9Profit, pbdata$X0Profit, main = "Profits at Pilgrim Bank in 1999 and 2000", sub = "Figure 1: Comparison betweem profits at Pilgrim Bank in the years 1999 and 2000",names = c("1999", "2000"), col = c("blue", "red"))
+```
+##Profitability of customers - Zoomed in
+From Figure 2 below, is shows that Pilgrim Bank's customers were more profitable in 2000 compared to 1999. Now considering reduced outliers, it is evident that the difference in profitability between the two years is very small. 
+```{r}
+boxplot(pbdata$X9Profit, pbdata$X0Profit, main = "Profits at Pilgrim Bank in 1999 and 2000", sub = "Figure 2: Comparison betweem profits at Pilgrim Bank in the years 1999 and 2000 - zoomed in", ylim = c(-200, 1000),names = c("1999", "2000"), col = c("blue", "red"))
+```
