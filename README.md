@@ -1,4 +1,4 @@
 # PilgrimBank 
 
-Logistic Regression
+Logistic Regression and
 Support Vector Machine
