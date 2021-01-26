@@ -1,0 +1,132 @@
+---
+title: "Pilgrim_Bank_B_Case_Study"
+author: "Whitney Chu"
+date: "02/10/2020"
+output:
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#Install Packages
+```{r}
+library(tidyverse)    
+library(e1071)  
+library(RColorBrewer)
+library(dplyr)
+library(caTools)
+
+```
+
+#Read and Import Pilgrim Bank Data
+```{r}
+PBD <- read.csv("PilgrimDataExt.csv")
+```
+
+#Preview Dataset
+```{r}
+# Preview the head and summary of the dataset
+head(PBD)
+summary(PBD)
+dim(PBD)
+```
+
+
+#Create Target Variable
+```{r}
+# create a column for customer retention (target variable)
+names(PBD)
+PBD <- data.frame(PBD)
+PBD$Customer_Retention <- ifelse(PBD$X9Online == 1 & PBD$X0Online == 1, 0, 1)
+names(PBD)
+```
+
+#Replace NA/Missing values
+```{r}
+#Replacing with median 
+PBD <- as.data.frame(impute(PBD, what = c("median")))
+```
+
+
+#Create training and test set
+```{r}
+# 75% Train and 25% Test
+rows <- c(1:nrow(PBD))
+split <- sample(rows, size = (nrow(PBD)/(4)))
+train <- PBD[-split, ]
+test <- PBD[split,]
+nrow(train)
+nrow(test)
+```
+
+
+#Generate Classifier
+
+##Create a model with logistic regression
+```{r}
+train.mod1 <- glm(formula = Customer_Retention ~ X9Online +X9Age + X9Inc + X9Profit + X9Tenure+ X9Billpay, data = train, family = "binomial")
+summary(train.mod1)
+```
+
+
+
+##Create a model Support Vector Machine (SVM)
+```{r}
+# Fitting SVM to the Training set 
+train.mod2 = svm(formula = Customer_Retention ~ X9Online +X9Age + X9Inc + X9Profit + X9Tenure + X9Billpay, 
+				data = train,kernel = 'linear') 
+```
+
+
+#Assess Error
+
+Assessment of the Training error and Testing Error.
+
+##Training Error for logistic regression
+```{r}
+predict.ret1 <- predict(train.mod1,train)
+pred <- ifelse(predict.ret1 > 0.5, "1", "0")
+mean(train$Customer_Retention!=pred)
+table(pred,train$Customer_Retention)
+```
+
+
+##Training Error for SVM
+```{r}
+predict.ret2 <- predict(train.mod2,train)
+pred <- ifelse(predict.ret2 > 0.5, "1", "0")
+mean(train$Customer_Retention!=pred)
+table(pred, train$Customer_Retention)
+```
+
+##Testing Error for logistic regression
+```{r}
+predict.ret1 <- predict(train.mod1,test)
+pred <- ifelse(predict.ret1 > 0.5, "1", "0")
+mean(test$Customer_Retention!=pred)
+table(pred, test$Customer_Retention)
+```
+
+
+##Testing Error for SVM
+```{r}
+predict.ret2 <- predict(train.mod2,test)
+pred <- ifelse(predict.ret2 > 0.5, "1", "0")
+mean(test$Customer_Retention!=pred)
+table(pred, test$Customer_Retention)
+```
+
+
+
+
+
+
+
+
+
+
+
+
